@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cloudflare-mcp"
+version = "0.1.0"
+description = "Read-only Cloudflare MCP server built with FastMCP, served over Streamable HTTP"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "ratno" }]
+keywords = ["mcp", "model-context-protocol", "cloudflare", "fastmcp", "read-only"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "fastmcp>=4.0",
+    "httpx>=0.27",
+    "PyYAML>=6.0",
+]
+
+[project.scripts]
+cloudflare-mcp = "cloudflare_mcp.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cloudflare_mcp"]

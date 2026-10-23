@@ -1,0 +1,7 @@
+# Copy this file to config.yaml and fill in your values.
+# config.yaml is gitignored — never commit real credentials.
+cloudflare:
+  # The account ID is parsed from this URL (the 32-hex-char segment after /accounts/).
+  base_url: "https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/tokens/verify"
+  # API token with read permissions (Zones:Read, DNS:Read, Workers KV:Read, Analytics:Read)
+  token: "<YOUR_API_TOKEN>"
