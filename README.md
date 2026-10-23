@@ -35,7 +35,7 @@ The server exposes the MCP protocol over **Streamable HTTP** at
 pipx install .
 
 # or straight from GitHub
-pipx install "git+https://github.com/<your-username>/cloudflare-mcp.git"
+pipx install "git+https://github.com/ratnoub/cloudflare-mcp.git"
 ```
 
 ### With pip

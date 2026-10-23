@@ -107,7 +107,10 @@ def spawn_daemon(args: argparse.Namespace) -> int:
         print(f"Daemon failed to start. Check {args.log_file}", file=sys.stderr)
         return 1
 
-    print(f"Cloudflare MCP daemon started (PID {proc.pid}).")
+    # The child may re-exec (e.g. a venv launcher spawning the real
+    # interpreter), so report the PID the child actually wrote.
+    actual_pid = _read_pid(args.pid_file) or proc.pid
+    print(f"Cloudflare MCP daemon started (PID {actual_pid}).")
     print(f"  MCP endpoint: http://{args.host}:{args.port}/mcp")
     print(f"  Log file:     {args.log_file}")
     print(f"  Stop with:    cloudflare-mcp --stop")
