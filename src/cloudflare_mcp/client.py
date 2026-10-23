@@ -60,5 +60,20 @@ class CloudflareClient:
             return {"result": result, "result_info": body["result_info"]}
         return result
 
+    async def get_zone_id_by_name(self, name: str) -> str:
+        """Resolve a zone (domain) name to its zone ID.
+
+        Uses the ``GET /zones?name=<name>`` endpoint, which filters by exact
+        zone name. Raises ``RuntimeError`` if no zone matches.
+        """
+        data = await self.get("/zones", params={"name": name})
+        zones = data.get("result", []) if isinstance(data, dict) else []
+        if not zones:
+            raise RuntimeError(
+                f"Zone '{name}' not found in the Cloudflare account. "
+                "Check the 'cloudflare.zone' value in config.yaml."
+            )
+        return zones[0]["id"]
+
     async def close(self) -> None:
         await self._client.aclose()

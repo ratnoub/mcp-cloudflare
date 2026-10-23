@@ -65,5 +65,6 @@ def load_config(path: Path | None = None) -> dict[str, str]:
         m = _ACCOUNT_ID_RE.search(str(cfg.get("base_url") or ""))
         if m:
             account_id = m.group(1)
+        zone = str(cfg.get("zone") or "").strip()
 
-    return {"token": token, "account_id": account_id}
+        return {"token": token, "account_id": account_id, "zone": zone}

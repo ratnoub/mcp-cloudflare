@@ -4,4 +4,9 @@ cloudflare:
   # The account ID is parsed from this URL (the 32-hex-char segment after /accounts/).
   base_url: "https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/tokens/verify"
   # API token with read permissions (Zones:Read, DNS:Read, Workers KV:Read, Analytics:Read)
+  # NOTE: do NOT include the "Bearer " prefix — the client adds it automatically.
   token: "<YOUR_API_TOKEN>"
+  # Optional: a default zone (domain name). When set, zone-scoped tools
+  # (get_zone, list_dns_records, get_zone_analytics) use it automatically
+  # when zone_id is omitted. Leave empty to always require zone_id.
+  zone: "example.com"

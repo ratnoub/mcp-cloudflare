@@ -61,10 +61,21 @@ Copy `config.example.yaml` to `config.yaml` and fill in your values:
 cloudflare:
   base_url: "https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/tokens/verify"
   token: "<YOUR_API_TOKEN>"
+  zone: "example.com"   # optional default zone (see below)
 ```
 
 The account ID is parsed from `base_url` (the 32-hex-character segment after
-`/accounts/`). Environment variables take precedence over the config file:
+`/accounts/`). The `token` must be the raw token **without** a `Bearer ` prefix
+(the client adds it automatically).
+
+**Default zone (optional).** Set `zone` to a domain name (e.g. `ub.ac.id`) to
+make it the default zone. When set, the zone-scoped tools — `get_zone`,
+`list_dns_records`, and `get_zone_analytics` — use it automatically when
+`zone_id` is omitted, so you don't have to pass the zone ID every time. You can
+still override it by passing an explicit `zone_id`. Leave `zone` empty to always
+require `zone_id`.
+
+Environment variables take precedence over the config file:
 
 | Variable | Purpose |
 | --- | --- |

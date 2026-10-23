@@ -19,14 +19,19 @@ READ_ONLY_ANNOTATIONS = {
 
 def build_server(cfg: dict[str, str]) -> FastMCP:
     """Build the FastMCP server with read-only Cloudflare tools."""
-    mcp = FastMCP(
-        "cloudflare",
-        instructions=(
-            "Read-only access to a Cloudflare account: zones, DNS records, "
-            "Workers KV namespaces/keys/values, and zone analytics. "
-            "No tool can modify data."
-        ),
+    instructions = (
+        "Read-only access to a Cloudflare account: zones, DNS records, "
+        "Workers KV namespaces/keys/values, and zone analytics. "
+        "No tool can modify data."
     )
+    if cfg.get("zone"):
+        instructions += (
+            f" A default zone is configured: '{cfg['zone']}'. Zone-scoped "
+            "tools (get_zone, list_dns_records, get_zone_analytics) use it "
+            "automatically when zone_id is omitted."
+        )
+
+    mcp = FastMCP("cloudflare", instructions=instructions)
     cf = CloudflareClient(cfg["token"], cfg["account_id"])
 
     def _account_id(account_id: Optional[str]) -> str:
@@ -37,6 +42,22 @@ def build_server(cfg: dict[str, str]) -> FastMCP:
                 "CLOUDFLARE_ACCOUNT_ID / cloudflare.base_url in config.yaml."
             )
         return aid
+
+    # Cache for the default zone ID (resolved lazily on first use).
+    _zone_cache: dict[str, str] = {}
+
+    async def _resolve_zone_id(zone_id: Optional[str]) -> str:
+        """Return the given zone_id, or the configured default zone's ID."""
+        if zone_id:
+            return zone_id
+        if not cfg.get("zone"):
+            raise ValueError(
+                "zone_id is required. Provide it as an argument or set "
+                "'cloudflare.zone' in config.yaml to define a default zone."
+            )
+        if "id" not in _zone_cache:
+            _zone_cache["id"] = await cf.get_zone_id_by_name(cfg["zone"])
+        return _zone_cache["id"]
 
     @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
     async def list_zones(
@@ -64,17 +85,19 @@ def build_server(cfg: dict[str, str]) -> FastMCP:
         return await cf.get("/zones", params=params)
 
     @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
-    async def get_zone(zone_id: str) -> Any:
-        """Get detailed information about a specific zone by its zone ID.
+    async def get_zone(zone_id: Optional[str] = None) -> Any:
+        """Get detailed information about a specific zone.
 
         Args:
-            zone_id: The zone ID (a 32-character hex string).
+            zone_id: The zone ID (a 32-character hex string). If omitted, uses
+                the default zone configured in config.yaml (cloudflare.zone).
         """
-        return await cf.get(f"/zones/{zone_id}")
+        zid = await _resolve_zone_id(zone_id)
+        return await cf.get(f"/zones/{zid}")
 
     @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
     async def list_dns_records(
-        zone_id: str,
+        zone_id: Optional[str] = None,
         type: Optional[str] = None,
         name: Optional[str] = None,
         content: Optional[str] = None,
@@ -84,13 +107,15 @@ def build_server(cfg: dict[str, str]) -> FastMCP:
         """List DNS records for a zone. Can filter by type, name, or content.
 
         Args:
-            zone_id: The zone ID.
+            zone_id: The zone ID. If omitted, uses the default zone from
+                config.yaml (cloudflare.zone).
             type: DNS record type to filter by (A, AAAA, CNAME, TXT, MX, ...).
             name: DNS record name to filter by (e.g. 'www' or 'example.com').
             content: DNS record content to filter by (e.g. an IP address).
             page: Page number for pagination (default 1).
             per_page: Records per page (default 20, max 100).
         """
+        zid = await _resolve_zone_id(zone_id)
         params: dict[str, Any] = {"page": page, "per_page": per_page}
         if type:
             params["type"] = type
@@ -98,7 +123,7 @@ def build_server(cfg: dict[str, str]) -> FastMCP:
             params["name"] = name
         if content:
             params["content"] = content
-        return await cf.get(f"/zones/{zone_id}/dns_records", params=params)
+        return await cf.get(f"/zones/{zid}/dns_records", params=params)
 
     @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
     async def list_kv_namespaces(
@@ -172,23 +197,25 @@ def build_server(cfg: dict[str, str]) -> FastMCP:
 
     @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
     async def get_zone_analytics(
-        zone_id: str,
+        zone_id: Optional[str] = None,
         since: Optional[str] = None,
         until: Optional[str] = None,
     ) -> Any:
         """Get analytics data for a zone: requests, bandwidth, threats, pageviews.
 
         Args:
-            zone_id: The zone ID.
+            zone_id: The zone ID. If omitted, uses the default zone from
+                config.yaml (cloudflare.zone).
             since: Start time (ISO 8601, e.g. '2026-10-01T00:00:00Z', or a
                 relative offset like '-1440' for the last 24 hours).
             until: End time (ISO 8601, or a relative offset like '-0').
         """
+        zid = await _resolve_zone_id(zone_id)
         params: dict[str, Any] = {}
         if since:
             params["since"] = since
         if until:
             params["until"] = until
-        return await cf.get(f"/zones/{zone_id}/analytics/dashboard", params=params)
+        return await cf.get(f"/zones/{zid}/analytics/dashboard", params=params)
 
     return mcp
