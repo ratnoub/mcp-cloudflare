@@ -3,7 +3,7 @@ requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 
 [project]
-name = "cloudflare-mcp"
+name = "mcp-cloudflare"
 version = "0.1.0"
 description = "Read-only Cloudflare MCP server built with FastMCP, served over Streamable HTTP"
 readme = "README.md"
@@ -32,7 +32,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cloudflare-mcp = "cloudflare_mcp.cli:main"
+mcp-cloudflare = "mcp_cloudflare.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/cloudflare_mcp"]
+packages = ["src/mcp_cloudflare"]

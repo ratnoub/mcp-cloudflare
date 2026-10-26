@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from fastmcp.server import FastMCP
 
-from cloudflare_mcp.client import CloudflareClient
+from mcp_cloudflare.client import CloudflareClient
 
 READ_ONLY_ANNOTATIONS = {
     "title": "Cloudflare (read-only)",

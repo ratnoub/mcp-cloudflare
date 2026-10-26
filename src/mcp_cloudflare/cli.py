@@ -11,8 +11,8 @@ import time
 from pathlib import Path
 from typing import Any, Optional
 
-from cloudflare_mcp.config import data_dir, default_config_path, load_config
-from cloudflare_mcp.server import build_server
+from mcp_cloudflare.config import data_dir, default_config_path, load_config
+from mcp_cloudflare.server import build_server
 
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 5751
@@ -59,7 +59,7 @@ def spawn_daemon(args: argparse.Namespace) -> int:
     child_args = [
         sys.executable,
         "-m",
-        "cloudflare_mcp",
+                "mcp_cloudflare",
         "--host", args.host,
         "--port", str(args.port),
         "--config", str(args.config),
@@ -113,7 +113,7 @@ def spawn_daemon(args: argparse.Namespace) -> int:
     print(f"Cloudflare MCP daemon started (PID {actual_pid}).")
     print(f"  MCP endpoint: http://{args.host}:{args.port}/mcp")
     print(f"  Log file:     {args.log_file}")
-    print(f"  Stop with:    cloudflare-mcp --stop")
+    print(f"  Stop with:    mcp-cloudflare --stop")
     return 0
 
 
@@ -156,7 +156,7 @@ def stop_daemon(pid_file: Path) -> int:
 
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        prog="cloudflare-mcp",
+        prog="mcp-cloudflare",
         description="Cloudflare MCP server (FastMCP, read-only) over Streamable HTTP",
     )
     p.add_argument("--host", default=DEFAULT_HOST,
@@ -164,24 +164,24 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     p.add_argument("--port", type=int, default=DEFAULT_PORT,
                    help=f"Bind port (default: {DEFAULT_PORT})")
     p.add_argument("--config", type=Path, default=None,
-                   help="Path to config.yaml (default: $CLOUDFLARE_MCP_CONFIG, "
-                        "./config.yaml, or ~/.config/cloudflare-mcp/config.yaml)")
+                   help="Path to config.yaml (default: $MCP_CLOUDFLARE_CONFIG, "
+                                           "./config.yaml, or ~/.config/mcp-cloudflare/config.yaml)")
     p.add_argument("--daemon", action="store_true",
                    help="Run in the background as a detached process")
     p.add_argument("--stop", action="store_true",
                    help="Stop the background daemon")
     p.add_argument("--pid-file", type=Path, default=None,
-                   help="PID file location (default: <data dir>/cloudflare_mcp.pid)")
+                   help="PID file location (default: <data dir>/mcp_cloudflare.pid)")
     p.add_argument("--log-file", type=Path, default=None,
-                   help="Daemon log file (default: <data dir>/cloudflare_mcp.log)")
+                   help="Daemon log file (default: <data dir>/mcp_cloudflare.log)")
     args = p.parse_args(argv)
 
     if args.config is None:
         args.config = default_config_path()
     if args.pid_file is None:
-        args.pid_file = data_dir() / "cloudflare_mcp.pid"
+        args.pid_file = data_dir() / "mcp_cloudflare.pid"
     if args.log_file is None:
-        args.log_file = data_dir() / "cloudflare_mcp.log"
+                args.log_file = data_dir() / "mcp_cloudflare.log"
     return args
 
 

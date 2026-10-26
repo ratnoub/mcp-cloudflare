@@ -1,4 +1,4 @@
-# cloudflare-mcp
+# mcp-cloudflare
 
 Read-only [MCP](https://modelcontextprotocol.io) (Model Context Protocol) server for
 [Cloudflare](https://www.cloudflare.com), built with [FastMCP](https://gofastmcp.com).
@@ -35,7 +35,7 @@ The server exposes the MCP protocol over **Streamable HTTP** at
 pipx install .
 
 # or straight from GitHub
-pipx install "git+https://github.com/ratnoub/cloudflare-mcp.git"
+pipx install "git+https://github.com/ratnoub/mcp-cloudflare.git"
 ```
 
 ### With pip
@@ -81,11 +81,11 @@ Environment variables take precedence over the config file:
 | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
-| `CLOUDFLARE_MCP_CONFIG` | Path to `config.yaml` |
+| `MCP_CLOUDFLARE_CONFIG` | Path to `config.yaml` |
 
-Config file search order: `--config` flag → `$CLOUDFLARE_MCP_CONFIG` →
-`./config.yaml` (current directory) → `~/.config/cloudflare-mcp/config.yaml`
-(on Windows: `%APPDATA%\cloudflare-mcp\config.yaml`).
+Config file search order: `--config` flag → `$MCP_CLOUDFLARE_CONFIG` →
+`./config.yaml` (current directory) → `~/.config/mcp-cloudflare/config.yaml`
+(on Windows: `%APPDATA%\mcp-cloudflare\config.yaml`).
 
 > ⚠️ `config.yaml` contains secrets. It is listed in `.gitignore` — never commit it.
 
@@ -93,22 +93,22 @@ Config file search order: `--config` flag → `$CLOUDFLARE_MCP_CONFIG` →
 
 ```bash
 # Foreground (default: 0.0.0.0:5751)
-cloudflare-mcp
+mcp-cloudflare
 
 # Run in the background as a daemon
-cloudflare-mcp --daemon
+mcp-cloudflare --daemon
 
 # Stop the daemon
-cloudflare-mcp --stop
+mcp-cloudflare --stop
 
 # Custom host / port
-cloudflare-mcp --host 127.0.0.1 --port 6000
+mcp-cloudflare --host 127.0.0.1 --port 6000
 ```
 
 The MCP endpoint is `http://<host>:<port>/mcp`.
 
 Daemon artifacts (PID file and log) are stored in the platform data directory:
-`%LOCALAPPDATA%\cloudflare-mcp\` on Windows, `~/.local/share/cloudflare-mcp/`
+`%LOCALAPPDATA%\mcp-cloudflare\` on Windows, `~/.local/share/mcp-cloudflare/`
 on Linux/macOS. Override with `--pid-file` / `--log-file`.
 
 ### MCP client configuration
@@ -131,9 +131,9 @@ Point any MCP client that supports Streamable HTTP at the endpoint, e.g.:
 .
 ├── config.example.yaml        # Template for config.yaml
 ├── pyproject.toml             # Package metadata + console script
-└── src/cloudflare_mcp/
+└── src/mcp_cloudflare/
     ├── __init__.py
-    ├── __main__.py            # python -m cloudflare_mcp
+    ├── __main__.py            # python -m mcp_cloudflare
     ├── cli.py                 # CLI: foreground / --daemon / --stop
     ├── client.py              # Async read-only Cloudflare REST client
     ├── config.py              # config.yaml + env var loading

@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-CONFIG_ENV_VAR = "CLOUDFLARE_MCP_CONFIG"
+CONFIG_ENV_VAR = "MCP_CLOUDFLARE_CONFIG"
 TOKEN_ENV_VAR = "CLOUDFLARE_API_TOKEN"
 ACCOUNT_ENV_VAR = "CLOUDFLARE_ACCOUNT_ID"
 
@@ -20,18 +20,18 @@ def data_dir() -> Path:
     """Platform-specific data directory for PID and log files."""
     if os.name == "nt":
         base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
-        return Path(base) / "cloudflare-mcp"
-    return Path(os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local" / "share"))) / "cloudflare-mcp"
+        return Path(base) / "mcp-cloudflare"
+    return Path(os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local" / "share"))) / "mcp-cloudflare"
 
 
 def default_config_path() -> Path:
     """Resolve the default config.yaml location.
 
     Search order:
-    1. ``$CLOUDFLARE_MCP_CONFIG``
+    1. ``$MCP_CLOUDFLARE_CONFIG``
     2. ``./config.yaml`` (current working directory)
-    3. ``~/.config/cloudflare-mcp/config.yaml``
-       (``%APPDATA%\\cloudflare-mcp\\config.yaml`` on Windows)
+    3. ``~/.config/mcp-cloudflare/config.yaml``
+       (``%APPDATA%\\mcp-cloudflare\\config.yaml`` on Windows)
     """
     env = os.environ.get(CONFIG_ENV_VAR)
     if env:
@@ -41,8 +41,8 @@ def default_config_path() -> Path:
         return local
     if os.name == "nt":
         base = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
-        return Path(base) / "cloudflare-mcp" / "config.yaml"
-    return Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "cloudflare-mcp" / "config.yaml"
+        return Path(base) / "mcp-cloudflare" / "config.yaml"
+    return Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "mcp-cloudflare" / "config.yaml"
 
 
 def load_config(path: Path | None = None) -> dict[str, str]:
