@@ -129,7 +129,6 @@ Point any MCP client that supports Streamable HTTP at the endpoint, e.g.:
 
 ```
 .
-├── .github/workflows/ci.yml   # CI: install, smoke test, build
 ├── config.example.yaml        # Template for config.yaml
 ├── pyproject.toml             # Package metadata + console script
 └── src/cloudflare_mcp/
